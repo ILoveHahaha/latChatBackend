@@ -8,9 +8,9 @@ let UserSQL = {
   updateUserPsw: 'UPDATE userregister SET urpsw = ? WHERE uid = ?',
   getUserFriendList: 'SELECT * FROM userinfo INNER JOIN userfriend ON userfriend.uid = ? AND userfriend.ufriid = userinfo.uid ',
   getMyselfInfo: 'SELECT * FROM userinfo WHERE uid = ?',
-  selectUserFriend: 'SELECT uname FROM userinfo WHERE uid LIKE ? UNION SELECT userinfo.uname FROM userregister LEFT JOIN userinfo ON userinfo.uid = userregister.uid AND userregister.uid LIKE ?',
+  selectUserFriend: 'SELECT uname,uid FROM userinfo WHERE uname LIKE ? OR uid LIKE ?',
   insertFriend: 'INSERT INTO userfriend(uid,ufriid) VALUES(?,?)',
-  checkMyFriend: 'INSERT INTO applyFriend(fromid, toid, applyState, applyMethod, formTable) VALUES(?,?,?,?,?)',
+  checkMyFriend: 'INSERT INTO applyFriend(fromid, toid, applyMethod, formTable) VALUES(?,?,?,?)',
   getGroupList: 'SELECT grouplist.gid,grouplist.uid,gname,glogo,gNotice FROM grouplist INNER JOIN groupconnect ON groupconnect.uid = ? AND groupconnect.gid = grouplist.gid',
   changeFriendShip: 'UPDATE userfriend SET ufInfo = ?,ufStyle = ? WHERE uid = ? AND ufriid = ?',
   getFriendShip: 'SELECT ufInfo,ufStyle FROM userfriend WHERE uid = ? AND ufriid = ?',
@@ -21,7 +21,7 @@ let UserSQL = {
   getGroupMaster: 'SELECT userinfo.uid,userinfo.uname,userinfo.ulogo FROM grouplist INNER JOIN userinfo ON gid = ? AND grouplist.uid = userinfo.uid',
   insertGroup: 'INSERT INTO groupconnect(gid,uid) VALUES(?,?)',
   exitGroup: 'DELETE FROM groupconnect WHERE gid = ? AND uid = ?',
-  newGroup: 'INSERT INTO grouplist(gid,gname,uid,glogo,gNotice,gtime) VALUES(?,?,?,?,?,?)',
+  newGroup: 'INSERT INTO grouplist(gname,uid,glogo,gNotice,gtime) VALUES(?,?,?,?,?)',
   deleteGroup: 'DELETE FROM grouplist,groupconnect USING grouplist,groupconnect WHERE groupconnect.gid = ? AND grouplist.uid = ? AND grouplist.gid = groupconnect.gid',
   changeGroupMessage: 'UPDATE grouplist SET gname = ?,glogo = ?,gNotice = ? WHERE uid = ? AND gid = ?',
   changeGroupMaster: 'UPDATE grouplist SET uid = ? WHERE uid = ? AND gid = ?',
@@ -34,9 +34,10 @@ let UserSQL = {
   deleteMyselfTrend: 'DELETE FROM usertrend WHERE uid = ? AND utNo = ?',
   getVoteTotal: 'SELECT vGood,vBad FROM vote WHERE utNo = ? AND vStyle = ?',
   getMyselfVote: 'SELECT vState FROM vote WHERE utNo = ? AND uid = ? AND vStyle = ?',
-  replyOther: 'INSERT INTO reply(rStyle,rid,buid,uid,ruid,rContent,rTime) VALUES(?,?,?,?,?,?,?)',
+  replyOther: 'INSERT INTO reply(rStyle,rid,buid,ruid,rContent,rTime) VALUES(?,?,?,?,?,?)',
   setMyselfVote: 'INSERT INTO vote(uid,vState,vStyle) VALUES(?,?,?)',
   changeMyselfVote: 'UPDATE vote vState WHERE utNo = ? AND uid = ? AND vStyle = ?',
-  deleteReply: 'DELETE FROM reply WHERE rNo = ? AND rid = ? AND ruid = ?'
+  deleteReply: 'DELETE FROM reply WHERE rNo = ? AND rid = ? AND ruid = ?',
+  getMyNewGroup: 'SELECT gid FROM grouplist WHERE uid = ? AND gtime = ?'
 };
 module.exports = UserSQL;

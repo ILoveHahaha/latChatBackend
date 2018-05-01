@@ -4,6 +4,7 @@ let user = require('../db/usersql');
 let mysql = require('mysql');
 let client = mysql.createConnection(dbConfig.mysql);
 let router = express.Router();
+let date = require('./time');
 
 // 用户好友列表
 router.post('/friendList', function(req, res, next) {
@@ -32,7 +33,7 @@ router.post('/selectFriend', function (req, res, next) {
 
 // 申请好友，目前添加好友需要经过申请，后期功能如何修改请看需求文档
 router.get('/applyFriend', function (req, res, next) {
-  client.query(user.checkMyFriend, [req.query.fromid, req.query.toid, req.query.applyState, req.query.applyMethod, req.query.formTable], function (err, result) {
+  client.query(user.checkMyFriend, [req.query.fromid, req.query.toid, req.query.applyMethod, 'trend'], function (err, result) {
     if (result.affectedRows > 0) {
       res.send({
         state: '1',
@@ -51,27 +52,16 @@ router.get('/applyFriend', function (req, res, next) {
 // 添加好友
 router.get('/insertFriend', function (req, res, next) {
   client.query(user.insertFriend, [req.query.uid, req.query.ufriid], function (err, result) {
-    if (result.affectedRows > 0) {
-      client.query(user.insertFriend, [req.query.ufriid, req.query.ufriid], function (err, result) {
-        if (err) {
-          res.send({
-            state: '0',
-            msg: err.code
-          })
-        }
-        else if (result.affectedRows > 0) {
-          res.send({
-            state: '1',
-            msg: '添加成功'
-          })
-        }
-        else {
-          client.query(user.deleteFriend, [req.query.uid, req.query.ufriid], function (err, result) {})
-          res.send({
-            state: '0',
-            msg: '添加失败'
-          })
-        }
+    if (err) {
+      res.send({
+        state: '0',
+        msg: err.code
+      })
+    }
+    else if (result.affectedRows > 0) {
+      res.send({
+        state: '1',
+        msg: '添加成功'
       })
     }
     else {
@@ -89,7 +79,8 @@ router.get('/changeInfo', function (req, res, next) {
   client.query(user.getFriendShip, [encodeURI(req.query.uid), encodeURI(req.query.ufriid)], function (err, result) {
     let ufInfo = encodeURI(req.query.ufInfo)
     let ufStyle = encodeURI(req.query.ufStyle)
-    console.log(req.query.ufInfo + ' ' + req.query.ufStyle)
+    console.log(req.query.ufInfo + ' ' + req.query.ufStyle);
+    // 可以用三目表达式来简写下面判断
     if (!req.query.ufInfo) {
       ufInfo = result[0].ufInfo
     }
@@ -104,7 +95,7 @@ router.get('/changeInfo', function (req, res, next) {
 
 // 删除好友
 router.post('/deleteFriend', function (req, res, next) {
-  client.query(user.getUserFriendList, [encodeURI(req.body.uid)], function (err, result) {
+  client.query(user.getFriendShip, [encodeURI(req.body.uid), encodeURI(req.body.ufriid)], function (err, result) {
     if (err) {
       res.send({
         state: '0',
@@ -262,7 +253,8 @@ router.get('/exitGroup', function (req, res, next) {
 
 // 创建群组
 router.post('/newGroup', function (req, res, next) {
-  client.query(user.newGroup, [req.body.gid, req.body.gname, req.body.uid, req.body.ulogo, req.body.gNotice, req.body.date], function (err, result) {
+  let time = date()
+  client.query(user.newGroup, [req.body.gname, req.body.uid, req.body.ulogo, req.body.gNotice, time], function (err, result) {
     if (err) {
       res.send({
         state: '0',
@@ -270,17 +262,27 @@ router.post('/newGroup', function (req, res, next) {
       })
     }
     else if (result.affectedRows > 0) {
-      client.query(user.insertGroup, [req.body.gid, encodeURI(req.body.uid)], function (err, result) {
+      client.query(user.getMyNewGroup, [req.body.uid, time], function (err, result) {
         if (err) {
           res.send({
             state: '0',
-            msg: '添加出错'
+            msg: err.code
           })
         }
-        else if (result.affectedRows > 0) {
-          res.send({
-            state: '1',
-            msg: '成功添加'
+        else {
+          client.query(user.insertGroup, [result[0].gid, encodeURI(req.body.uid)], function (err, result) {
+            if (err) {
+              res.send({
+                state: '0',
+                msg: err.code
+              })
+            }
+            else if (result.affectedRows > 0) {
+              res.send({
+                state: '1',
+                msg: '成功添加'
+              })
+            }
           })
         }
       })
@@ -296,8 +298,6 @@ router.post('/newGroup', function (req, res, next) {
 
 // 删除群组
 router.get('/deleteGroup', function (req, res, next) {
-  console.log(req.query.gid)
-  console.log(req.query.uid)
   client.query(user.deleteGroup, [req.query.gid, encodeURI(req.query.uid)], function (err, result) {
     if (err) {
       res.send({
@@ -327,8 +327,6 @@ router.get('/deleteGroup', function (req, res, next) {
 router.post('/changeGroupList', function (req, res, next) {
   console.log(req.body)
   client.query(user.changeGroupMessage, [req.body.gname, req.body.glogo, req.body.gNotice, req.body.uid, req.body.gid], function (err, result) {
-    console.log(err)
-    console.log(result)
     if (err) {
       res.send({
         state: '0',
@@ -437,7 +435,7 @@ router.post('/friendInfo', function (req, res, next) {
 
 // 修改个人信息
 router.post('/changeMyselfInfo', function (req, res, next) {
-  client.query(user.changeMyself, [req.body.uname,req.body.ulogo,req.body.usex,req.body.usign,req.body.ucity,req.body.uid], function (err, result) {
+  client.query(user.changeMyself, [req.body.uname, req.body.ulogo, req.body.usex, req.body.usign, req.body.ucity, req.body.uid], function (err, result) {
     if (err) {
       res.send({
         state: '0',

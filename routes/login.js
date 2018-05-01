@@ -52,21 +52,31 @@ router.post('/user/register', function (req, res, next) {
         if (err) {
           res.send({
             state: '0',
-            msg: '注册失败'
+            msg: err.code
           })
         }
         else {
-          client.query(user.insertUserInfo, [req.body.uid, req.body.password], function () {
+          client.query(user.insertUserInfo, [req.body.uid, req.body.password], function (err, result) {
             if (err) {
               res.send({
                 state: '0',
-                msg: '注册失败'
+                msg: err.code
               })
             }
             else {
-              res.send({
-                state: '1',
-                msg: '注册成功'
+              client.query(user.insertFriend, [req.body.uid, req.body.uid], function (err, result) {
+                if (err) {
+                  res.send({
+                    state: '0',
+                    msg: err.code
+                  })
+                }
+                else {
+                  res.send({
+                    state: '1',
+                    msg: '注册成功'
+                  })
+                }
               })
             }
           })

@@ -9,20 +9,9 @@
 </body>
 <script src="jquery.js"></script>
 <script>
-    function getCurrentDate() {
-      let date = new Date()
-      let year = '年'
-      let month = '月'
-      let day = '日'
-      let separator = ':'
-      var currentDate = date.getFullYear() + year + (date.getMonth() + 1)
-              + month + date.getDate() + day + date.getHours() + separator +
-              date.getMinutes() + separator + date.getSeconds()
-      return currentDate
-    }
     $('button').click(function () {
       $.ajax({
-        url: 'http://127.0.0.1:3000/trend/getFriendTrend',
+        url: 'http://127.0.0.1:3000/index/newGroup',
         // url: 'http://127.0.0.1:3000/index/insertFriend',
         // url: 'http://127.0.0.1:3000/login/user/changePsw',
         method: 'post',
@@ -40,7 +29,6 @@
           glogo: '',
           ulogo: '',
           gNotice: '新人请注意',
-          date: getCurrentDate(),
           masterId: 'test@qq.com',
           memberId: 'test1@qq.com',
           uname: '超级无敌大靓仔',

@@ -4,8 +4,9 @@ let user = require('../db/usersql')
 let mysql = require('mysql')
 let client = mysql.createConnection(dbConfig.mysql)
 let router = express.Router();
+let date = require('./time');
 
-// 获取动态圈及评论和点评
+// 获取动态圈及评论和点评(为实现的一个通过一个vState字段来统计好评和差评，不用vGood和vBad)
 router.post('/getFriendTrend', function (req, res, next) {
   client.query(user.getFriendTrend, [req.body.uid], function (err, result) {
     if (err) {
@@ -86,7 +87,8 @@ router.get('/deleteMyselfTrend', function (req, res, next) {
 
 // 评论别人动态
 router.get('/replyOther', function (req, res, next) {
-  client.query(user.replyOther, [req.query.rStyle,req.query.rid,req.query.buid,req.query.uid,req.query.ruid,req.query.rContent,req.query.rTime], function (err, result) {
+  req.query.rContent = '回复：' + req.query.rContent
+  client.query(user.replyOther, ['trend', req.query.rid, req.query.buid, req.query.ruid, req.query.rContent, date()], function (err, result) {
     if (err) {
       res.send({
         state: '0',
@@ -110,12 +112,12 @@ router.get('/replyOther', function (req, res, next) {
 
 // 点赞或修改点赞动态
 router.get('/setMyselfVote', function (req, res, next) {
-  client.query(user.getMyselfVote, [req.query.utNo, req.query.uid, req.query.vStyle], function (err, result) {
+  client.query(user.getMyselfVote, [req.query.utNo, req.query.uid, 'trend'], function (err, result) {
     if (err) {
 
     }
     else if (result.length > 0) {
-      client.query(user.changeMyselfVote, [req.query.utNo, req.query.uid, req.query.vStyle], function (err, result) {
+      client.query(user.changeMyselfVote, [req.query.utNo, req.query.uid, 'trend'], function (err, result) {
         if (err) {
           res.send({
             state: '0',
@@ -137,7 +139,7 @@ router.get('/setMyselfVote', function (req, res, next) {
       })
     }
     else {
-      client.query(user.setMyselfVote, [req.query.uid, req.query.vState, req.query.vStyle], function (err, result) {
+      client.query(user.setMyselfVote, [req.query.uid, req.query.vState, 'trend'], function (err, result) {
         if (err) {
           res.send({
             state: '0',
