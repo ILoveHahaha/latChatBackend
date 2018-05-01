@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button>试一下</button>
+</body>
+<script src="jquery.js"></script>
+<script>
+    function getCurrentDate() {
+      let date = new Date()
+      let year = '年'
+      let month = '月'
+      let day = '日'
+      let separator = ':'
+      var currentDate = date.getFullYear() + year + (date.getMonth() + 1)
+              + month + date.getDate() + day + date.getHours() + separator +
+              date.getMinutes() + separator + date.getSeconds()
+      return currentDate
+    }
+    $('button').click(function () {
+      $.ajax({
+        url: 'http://127.0.0.1:3000/trend/getFriendTrend',
+        // url: 'http://127.0.0.1:3000/index/insertFriend',
+        // url: 'http://127.0.0.1:3000/login/user/changePsw',
+        method: 'post',
+        data: {
+          fromid: 'test@qq.com',
+          toid: '1124158937@qq.com',
+          applyState: 0,
+          applyMethod: 'friendFind',
+          formTable: 'index',
+          uid: 'test@qq.com',
+          ufriid: '1134196243@qq.com',
+          ufStyle: 'best',
+          gid: '3',
+          gname: '新群',
+          glogo: '',
+          ulogo: '',
+          gNotice: '新人请注意',
+          date: getCurrentDate(),
+          masterId: 'test@qq.com',
+          memberId: 'test1@qq.com',
+          uname: '超级无敌大靓仔',
+          usex: 'man',
+          ucity: '广东中山',
+          usign: '修改一下',
+          utNo: 2
+          // ufInfo: ''
+          // findFriend: '1',
+          // password: '123456'
+        }
+      })
+    })
+</script>
+</html>
