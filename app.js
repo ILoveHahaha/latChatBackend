@@ -10,7 +10,7 @@ let indexRouter = require('./routes/index');
 let loginRouter = require('./routes/login');
 let trendRouter = require('./routes/trend');
 // var interestRouter = require('./routes/interest');
-// var messageRouter = require('./routes/message');
+var messageRouter = require('./routes/message');
 // var settingRouter = require('./routes/setting')
 
 let app = express();
@@ -27,7 +27,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 设置请求头
 app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
+  // res.header('Access-Control-Allow-Origin', 'http://localhost:8088');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:63342');
   res.header('Access-Control_allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'x-custom');
   res.header('Access-Control-Allow-Credentials', 'true');
@@ -39,7 +40,7 @@ app.use('/index', indexRouter);
 app.use('/login', loginRouter);
 app.use('/trend', trendRouter);
 // app.use('/interest', interestRouter);
-// app.use('/message', messageRouter);
+app.use('/message', messageRouter);
 // app.use('/setting', settingRouter);
 
 // catch 404 and forward to error handler

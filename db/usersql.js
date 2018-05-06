@@ -38,6 +38,10 @@ let UserSQL = {
   setMyselfVote: 'INSERT INTO vote(uid,vState,vStyle) VALUES(?,?,?)',
   changeMyselfVote: 'UPDATE vote vState WHERE utNo = ? AND uid = ? AND vStyle = ?',
   deleteReply: 'DELETE FROM reply WHERE rNo = ? AND rid = ? AND ruid = ?',
-  getMyNewGroup: 'SELECT gid FROM grouplist WHERE uid = ? AND gtime = ?'
+  getMyNewGroup: 'SELECT gid FROM grouplist WHERE uid = ? AND gtime = ?',
+  getSingleMessage: 'SELECT * FROM usersinglemessage WHERE uid = ?',
+  setSingleMessage: 'INSERT INTO usersinglemessage(uid,fromid,toid,usmMessage,usmTime) VALUES(?,?,?,?,?)',
+  getGroupMessage: 'SELECT * FROM groupmessage WHERE gid = ? AND uid = ?',
+  setGroupMessage: 'INSERT INTO groupmessage(gid,uid,fromid,gmContent,gmTime) VALUES(?,?,?,?,?)'
 };
 module.exports = UserSQL;

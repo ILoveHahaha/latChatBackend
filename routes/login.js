@@ -1,8 +1,8 @@
 let express = require('express');
-let dbConfig = require('../db/DBConfig')
-let user = require('../db/usersql')
-let mysql = require('mysql')
-let client = mysql.createConnection(dbConfig.mysql)
+let dbConfig = require('../db/DBConfig');
+let user = require('../db/usersql');
+let mysql = require('mysql');
+let client = mysql.createConnection(dbConfig.mysql);
 let router = express.Router();
 
 /**
@@ -35,7 +35,6 @@ router.post('/user/login', function(req, res, next) {
       })
     }
   })
-  next()
 });
 
 // 注册接口
@@ -56,7 +55,7 @@ router.post('/user/register', function (req, res, next) {
           })
         }
         else {
-          client.query(user.insertUserInfo, [req.body.uid, req.body.password], function (err, result) {
+          client.query(user.insertUserInfo, [req.body.uid, req.body.uname], function (err, result) {
             if (err) {
               res.send({
                 state: '0',
@@ -83,7 +82,6 @@ router.post('/user/register', function (req, res, next) {
         }
       })
     }
-    next()
   })
 });
 
@@ -112,7 +110,6 @@ router.post('/user/changePsw', function (req, res, next) {
         }
       })
     }
-    // next()
   })
 })
 
